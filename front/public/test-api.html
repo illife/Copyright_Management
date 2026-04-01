@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API 测试页面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .test-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      max-height: 400px;
+    }
+    .success {
+      color: #67c23a;
+    }
+    .error {
+      color: #f56c6c;
+    }
+    .warning {
+      color: #e6a23c;
+    }
+  </style>
+</head>
+<body>
+  <h1>区块链 API 测试页面</h1>
+
+  <div class="test-section">
+    <h2>1. 测试网络统计接口</h2>
+    <button onclick="testStats()">测试 /api/explorer/stats</button>
+    <pre id="stats-result">点击按钮开始测试...</pre>
+  </div>
+
+  <div class="test-section">
+    <h2>2. 测试区块列表接口</h2>
+    <button onclick="testBlocks()">测试 /api/explorer/blocks/latest?limit=10</button>
+    <pre id="blocks-result">点击按钮开始测试...</pre>
+  </div>
+
+  <div class="test-section">
+    <h2>3. 测试区块详情接口</h2>
+    <input type="number" id="blockNumber" value="170" placeholder="输入区块高度" style="padding: 8px; margin-right: 10px;">
+    <button onclick="testBlockDetail()">测试区块详情</button>
+    <pre id="detail-result">点击按钮开始测试...</pre>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+
+    async function testStats() {
+      const resultEl = document.getElementById('stats-result');
+      resultEl.textContent = '正在请求...';
+
+      try {
+        console.log('请求路径:', `${API_BASE}/explorer/stats`);
+
+        const response = await fetch(`${API_BASE}/explorer/stats`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log('响应状态:', response.status);
+        console.log('响应头:', Object.fromEntries(response.headers));
+
+        const data = await response.json();
+        console.log('响应数据:', data);
+
+        resultEl.innerHTML = `<span class="success">✓ 请求成功</span>\n\n` +
+          `状态码: ${response.status}\n\n` +
+          `返回数据:\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        console.error('请求失败:', error);
+        resultEl.innerHTML = `<span class="error">✗ 请求失败</span>\n\n` +
+          `错误信息: ${error.message}\n\n` +
+          `完整错误:\n${JSON.stringify(error, null, 2)}`;
+      }
+    }
+
+    async function testBlocks() {
+      const resultEl = document.getElementById('blocks-result');
+      resultEl.textContent = '正在请求...';
+
+      try {
+        console.log('请求路径:', `${API_BASE}/explorer/blocks/latest?limit=10`);
+
+        const response = await fetch(`${API_BASE}/explorer/blocks/latest?limit=10`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log('响应状态:', response.status);
+
+        const data = await response.json();
+        console.log('响应数据:', data);
+
+        resultEl.innerHTML = `<span class="success">✓ 请求成功</span>\n\n` +
+          `状态码: ${response.status}\n\n` +
+          `返回数据:\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        console.error('请求失败:', error);
+        resultEl.innerHTML = `<span class="error">✗ 请求失败</span>\n\n` +
+          `错误信息: ${error.message}\n\n` +
+          `完整错误:\n${JSON.stringify(error, null, 2)}`;
+      }
+    }
+
+    async function testBlockDetail() {
+      const blockNumber = document.getElementById('blockNumber').value;
+      const resultEl = document.getElementById('detail-result');
+      resultEl.textContent = '正在请求...';
+
+      try {
+        console.log('请求路径:', `${API_BASE}/explorer/block/${blockNumber}`);
+
+        const response = await fetch(`${API_BASE}/explorer/block/${blockNumber}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log('响应状态:', response.status);
+
+        const data = await response.json();
+        console.log('响应数据:', data);
+
+        resultEl.innerHTML = `<span class="success">✓ 请求成功</span>\n\n` +
+          `状态码: ${response.status}\n\n` +
+          `返回数据:\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        console.error('请求失败:', error);
+        resultEl.innerHTML = `<span class="error">✗ 请求失败</span>\n\n` +
+          `错误信息: ${error.message}\n\n` +
+          `完整错误:\n${JSON.stringify(error, null, 2)}`;
+      }
+    }
+
+    // 页面加载时自动测试
+    window.onload = function() {
+      console.log('API 测试页面已加载');
+      console.log('API Base URL:', API_BASE);
+      console.log('当前页面 URL:', window.location.href);
+    };
+  </script>
+</body>
+</html>

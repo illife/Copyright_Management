@@ -1,0 +1,11 @@
+// 统一导出所有API模块
+export * as auth from './auth'
+export * as blockchain from './blockchain'
+export * as copyright from './copyright'
+export * as file from './file'
+export * as license from './license'
+export * as registration from './registration'
+export * as royalty from './royalty'
+export * as stats from './stats'
+export * as transaction from './transaction'
+export * as user from './user'

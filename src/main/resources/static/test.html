@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>版权管理平台 - IPFS测试页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .file-upload {
+            border: 2px dashed #667eea;
+            padding: 30px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            background: #f8f9ff;
+        }
+
+        .file-upload:hover {
+            background: #eef2ff;
+            border-color: #5568d3;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #667eea;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-info {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #1976d2;
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .result pre {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 10px;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .status-badge.online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            color: #1976d2;
+            font-size: 14px;
+        }
+
+        .info-box p strong {
+            display: inline-block;
+            min-width: 100px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .link-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .link-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>🎨 版权管理平台 - IPFS测试页面</h1>
+            <p>基于 FISCO BCOS + IPFS (Apache HttpClient) 的版权管理系统</p>
+        </div>
+
+        <!-- IPFS 状态检查 -->
+        <div class="card">
+            <h2>📡 IPFS 状态检查</h2>
+            <div id="ipfsStatus" class="info-box">
+                <p>⏳ 正在检查 IPFS 状态...</p>
+            </div>
+            <button class="btn btn-secondary" onclick="checkIPFSStatus()">🔄 刷新状态</button>
+        </div>
+
+        <!-- 登录 -->
+        <div class="card">
+            <h2>🔐 用户登录</h2>
+            <div class="form-group">
+                <label>管理员地址</label>
+                <input type="text" id="loginAddress" value="0xb82ea6626cb8cd46081b2dc6ece702864490f366" placeholder="0x...">
+            </div>
+            <button class="btn btn-primary" onclick="login()">登录</button>
+            <button class="btn btn-secondary" onclick="toggleTokenInput()">手动设置Token</button>
+            <div id="tokenInputGroup" style="display: none; margin-top: 20px;">
+                <div class="form-group">
+                    <label>JWT Token</label>
+                    <textarea id="manualToken" rows="3" placeholder="粘贴JWT Token...">eyJhbGciOiJIUzUxMiJ9.eyJhZGRyZXNzIjoiMHhiODJlYTY2MjZjYjhjZDQ2MDgxYjJkYzZlY2U3MDI4NjQ0OTBmMzY2Iiwicm9sZSI6IkFETUlOIiwic3ViIjoiMHhiODJlYTY2MjZjYjhjZDQ2MDgxYjJkYzZlY2U3MDI4NjQ0OTBmMzY2IiwiaWF0IjoxNzY3MTE1NDk2LCJleHAiOjE3NjcyMDE4OTZ9.CZvbLNmDJEje7c05FplT6p2n-jxZDM-Pzfn-jUoODQLJ8sURCSoY3OTuNPA18m0Pq_0l6acrMxEuz-C1PDFa8w</textarea>
+                </div>
+                <button class="btn btn-success" onclick="setManualToken()">设置Token</button>
+            </div>
+            <div id="loginResult" class="result"></div>
+            <div id="currentTokenDisplay" style="margin-top: 15px; padding: 10px; background: #f5f5f5; border-radius: 5px; display: none;">
+                <strong>当前Token:</strong> <span id="tokenPreview" style="font-size: 12px; color: #666;"></span>
+            </div>
+        </div>
+
+        <!-- 文件上传 -->
+        <div class="card">
+            <h2>📤 文件上传到 IPFS</h2>
+            <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" onchange="showFileName()">
+                <div class="file-upload-icon">📁</div>
+                <p>点击选择文件或拖拽文件到此处</p>
+                <p class="file-name" id="fileName"></p>
+            </div>
+            <br>
+            <button class="btn btn-success" onclick="uploadFile()">上传到 IPFS</button>
+            <div id="uploadResult" class="result"></div>
+        </div>
+
+        <!-- 文本上传测试 -->
+        <div class="card">
+            <h2>📝 文本内容上传测试</h2>
+            <div class="form-group">
+                <label>输入文本内容</label>
+                <textarea id="textContent" placeholder="输入要上传到IPFS的文本内容...">Hello IPFS! 这是测试文本。</textarea>
+            </div>
+            <button class="btn btn-info" onclick="uploadText()">上传文本到 IPFS</button>
+            <div id="textUploadResult" class="result"></div>
+        </div>
+
+        <!-- 版权注册（带文件） -->
+        <div class="card">
+            <h2>📚 注册版权（带文件上传）</h2>
+            <div class="info-box" style="background: #e8f5e9; border-left-color: #4caf50;">
+                <p>ℹ️ 新合约版本：版权所有者将自动从您的登录Token获取</p>
+            </div>
+            <div class="form-group">
+                <label>作品标题</label>
+                <input type="text" id="title" value="我的第一首原创歌曲" placeholder="输入作品标题">
+            </div>
+            <div class="form-group">
+                <label>作者</label>
+                <input type="text" id="author" value="Alice" placeholder="输入作者名">
+            </div>
+            <div class="form-group">
+                <label>作品描述</label>
+                <textarea id="description" placeholder="输入作品描述（可选）">这是一首关于春天的原创歌曲，旋律优美，歌词动人。</textarea>
+            </div>
+            <div class="form-group">
+                <label>作品文件</label>
+                <div class="file-upload" onclick="document.getElementById('copyrightFile').click()">
+                    <input type="file" id="copyrightFile" onchange="showCopyrightFileName()">
+                    <div class="file-upload-icon">🎵</div>
+                    <p>点击选择作品文件</p>
+                    <p class="file-name" id="copyrightFileName"></p>
+                </div>
+            </div>
+            <br>
+            <button class="btn btn-primary" onclick="registerCopyrightWithFile()">📚 注册版权</button>
+            <div id="registerResult" class="result"></div>
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="card">
+            <h2>⚡ 快捷操作</h2>
+            <div class="two-column">
+                <div>
+                    <button class="btn btn-secondary" onclick="listCopyrights()">查看版权列表</button>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="checkPermissions()">检查权限状态</button>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="two-column">
+                <div>
+                    <button class="btn btn-info" onclick="testDownload()">测试本地文件下载</button>
+                </div>
+                <div>
+                    <button class="btn btn-info" onclick="clearResults()">清除所有结果</button>
+                </div>
+            </div>
+            <br>
+            <div id="quickActionResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = '';
+        let uploadedFileHash = '';
+
+        // 后端API基础URL（根据实际访问方式自动检测）
+        const API_BASE_URL = window.location.port === '8081' || window.location.port === '63342'
+            ? 'http://localhost:8081'  // 如果通过8081或IDE预览访问，使用8081
+            : `${window.location.protocol}//${window.location.hostname}:8081`;
+
+        console.log('API Base URL:', API_BASE_URL);
+
+        // 页面加载时自动检查 IPFS 状态和登录
+        window.onload = function() {
+            checkIPFSStatus();
+            autoLogin();
+        };
+
+        // 自动登录
+        async function autoLogin() {
+            const address = document.getElementById('loginAddress').value;
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/users/login?address=${address}`);
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    authToken = data.data.token;
+                    updateTokenDisplay();
+                    showResult('loginResult', '✅ 自动登录成功！', { token: authToken.substring(0, 30) + '...' }, 'success');
+                    setTimeout(() => {
+                        document.getElementById('loginResult').style.display = 'none';
+                    }, 3000);
+                } else {
+                    showResult('loginResult', '⚠️ 自动登录失败，请手动登录或设置Token', data, 'error');
+                }
+            } catch (error) {
+                console.error('自动登录失败:', error);
+                showResult('loginResult', '⚠️ 自动登录失败: ' + error.message + '\n\n请手动登录或点击"手动设置Token"', null, 'error');
+            }
+        }
+
+        // 登录
+        async function login() {
+            const address = document.getElementById('loginAddress').value;
+            try {
+                showResult('loginResult', '<span class="loading"></span>正在登录...', null, 'info');
+
+                const response = await fetch(`${API_BASE_URL}/api/users/login?address=${address}`);
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    authToken = data.data.token;
+                    updateTokenDisplay();
+                    showResult('loginResult', '✅ 登录成功！Token 已保存', { token: authToken.substring(0, 30) + '...' }, 'success');
+                } else {
+                    showResult('loginResult', '❌ 登录失败: ' + data.message, data, 'error');
+                }
+            } catch (error) {
+                showResult('loginResult', '❌ 请求失败: ' + error.message, null, 'error');
+            }
+        }
+
+        // 切换Token输入框显示/隐藏
+        function toggleTokenInput() {
+            const tokenGroup = document.getElementById('tokenInputGroup');
+            if (tokenGroup.style.display === 'none') {
+                tokenGroup.style.display = 'block';
+            } else {
+                tokenGroup.style.display = 'none';
+            }
+        }
+
+        // 手动设置Token
+        function setManualToken() {
+            const manualToken = document.getElementById('manualToken').value.trim();
+            if (!manualToken) {
+                showResult('loginResult', '❌ 请输入Token', null, 'error');
+                return;
+            }
+
+            authToken = manualToken;
+            updateTokenDisplay();
+            showResult('loginResult', '✅ Token 已设置！\n\nToken: ' + authToken.substring(0, 30) + '...\n\n现在可以使用其他功能了', { token: authToken.substring(0, 30) + '...' }, 'success');
+
+            // 隐藏token输入框
+            document.getElementById('tokenInputGroup').style.display = 'none';
+        }
+
+        // 更新Token显示
+        function updateTokenDisplay() {
+            const display = document.getElementById('currentTokenDisplay');
+            const preview = document.getElementById('tokenPreview');
+
+            if (authToken) {
+                display.style.display = 'block';
+                preview.textContent = authToken.length > 50 ?
+                    authToken.substring(0, 50) + '...' :
+                    authToken;
+            } else {
+                display.style.display = 'none';
+            }
+        }
+
+        // 检查 IPFS 状态
+        async function checkIPFSStatus() {
+            const statusDiv = document.getElementById('ipfsStatus');
+            statusDiv.innerHTML = '<p><span class="loading" style="border-color: #1976d2; border-top-color: #fff;"></span>正在检查 IPFS 状态...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/files/ipfs/status`);
+                const data = await response.json();
+
+                if (data.code === 0 && data.data.ipfsRunning) {
+                    const versionText = data.data.version || 'N/A';
+                    // 提取版本号（去除多余信息）
+                    const versionMatch = versionText.match(/ipfs version\s+(\d+\.\d+\.\d+)/);
+                    const cleanVersion = versionMatch ? versionMatch[1] : versionText;
+
+                    statusDiv.innerHTML = `
+                        <div class="status-badge online">🟢 IPFS 在线</div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value">${cleanVersion}</div>
+                                <div class="stat-label">IPFS 版本</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" style="font-size: 14px; word-break: break-all;">${data.data.nodeId || 'N/A'}</div>
+                                <div class="stat-label">节点 ID</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">${data.data.peerCount || 0}</div>
+                                <div class="stat-label">连接节点数</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `
+                        <div class="status-badge offline">🔴 IPFS 离线</div>
+                        <p>请启动 IPFS daemon:</p>
+                        <pre style="margin-top: 10px; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 5px;">ipfs daemon</pre>
+                    `;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="status-badge offline">🔴 无法连接到后端服务</div>
+                    <p><strong>错误:</strong> ${error.message}</p>
+                    <p>请确保:</p>
+                    <p>1. Spring Boot 应用正在运行 (端口 8081)</p>
+                    <p>2. IPFS daemon 正在运行</p>
+                `;
+            }
+        }
+
+        // 显示文件名
+        function showFileName() {
+            const input = document.getElementById('fileInput');
+            const fileName = document.getElementById('fileName');
+            if (input.files.length > 0) {
+                fileName.textContent = '✅ 已选择: ' + input.files[0].name;
+            }
+        }
+
+        function showCopyrightFileName() {
+            const input = document.getElementById('copyrightFile');
+            const fileName = document.getElementById('copyrightFileName');
+            if (input.files.length > 0) {
+                fileName.textContent = '✅ 已选择: ' + input.files[0].name;
+            }
+        }
+
+        // 上传文件
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                showResult('uploadResult', '❌ 请先选择文件', null, 'error');
+                return;
+            }
+
+            if (!authToken) {
+                showResult('uploadResult', '❌ 请先登录', null, 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                showResult('uploadResult', '<span class="loading"></span>正在上传到 IPFS...', null, 'info');
+
+                const response = await fetch(`${API_BASE_URL}/api/files/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: formData
+                });
+
+                // 检查响应状态
+                if (!response.ok) {
+                    let errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.message || errorMsg;
+                    } catch (e) {
+                        // 无法解析为JSON
+                    }
+                    showResult('uploadResult', `❌ 上传失败\n\n状态码: ${response.status}\n错误: ${errorMsg}`, null, 'error');
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    const result = data.data;
+                    uploadedFileHash = result.fileHash;
+
+                    let message = `✅ 文件上传成功！\n\n`;
+                    message += `📄 文件名: ${result.fileName}\n`;
+                    message += `📏 文件大小: ${result.fileSize} bytes\n`;
+                    message += `💾 存储方式: ${result.storage === 'ipfs' ? 'IPFS (去中心化)' : '本地存储'}\n`;
+                    message += `🔑 文件哈希: ${result.fileHash}\n`;
+
+                    if (result.ipfsUrl) {
+                        message += `\n🌐 IPFS 网关 URL:\n${result.ipfsUrl}`;
+                    }
+
+                    showResult('uploadResult', message, result, 'success');
+                } else {
+                    showResult('uploadResult', '❌ 上传失败: ' + data.message, data, 'error');
+                }
+            } catch (error) {
+                showResult('uploadResult', '❌ 请求失败: ' + error.message, null, 'error');
+            }
+        }
+
+        // 上传文本
+        async function uploadText() {
+            const textContent = document.getElementById('textContent').value;
+
+            if (!textContent.trim()) {
+                showResult('textUploadResult', '❌ 请输入文本内容', null, 'error');
+                return;
+            }
+
+            if (!authToken) {
+                showResult('textUploadResult', '❌ 请先登录', null, 'error');
+                return;
+            }
+
+            try {
+                showResult('textUploadResult', '<span class="loading"></span>正在上传文本到 IPFS...', null, 'info');
+
+                // 将文本转换为 Blob
+                const blob = new Blob([textContent], { type: 'text/plain' });
+                const formData = new FormData();
+                formData.append('file', blob, 'text.txt');
+
+                const response = await fetch(`${API_BASE_URL}/api/files/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: formData
+                });
+
+                // 检查响应状态
+                if (!response.ok) {
+                    let errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.message || errorMsg;
+                    } catch (e) {
+                        // 无法解析为JSON
+                    }
+                    showResult('textUploadResult', `❌ 上传失败\n\n状态码: ${response.status}\n错误: ${errorMsg}`, null, 'error');
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    const result = data.data;
+                    let message = `✅ 文本上传成功！\n\n`;
+                    message += `📝 内容长度: ${textContent.length} 字符\n`;
+                    message += `💾 存储方式: ${result.storage}\n`;
+                    message += `🔑 文件哈希: ${result.fileHash}\n`;
+
+                    if (result.ipfsUrl) {
+                        message += `\n🌐 访问链接:\n${result.ipfsUrl}`;
+                    }
+
+                    showResult('textUploadResult', message, result, 'success');
+                } else {
+                    showResult('textUploadResult', '❌ 上传失败: ' + data.message, data, 'error');
+                }
+            } catch (error) {
+                showResult('textUploadResult', '❌ 请求失败: ' + error.message, null, 'error');
+            }
+        }
+
+        // 注册版权（带文件）
+        async function registerCopyrightWithFile() {
+            const fileInput = document.getElementById('copyrightFile');
+            if (fileInput.files.length === 0) {
+                showResult('registerResult', '❌ 请先选择文件', null, 'error');
+                return;
+            }
+
+            if (!authToken) {
+                showResult('registerResult', '❌ 请先登录', null, 'error');
+                return;
+            }
+
+            // 新合约版本：不再获取owner，从token自动获取
+            const title = document.getElementById('title').value;
+            const author = document.getElementById('author').value;
+            const description = document.getElementById('description').value;
+
+            if (!title || !author) {
+                showResult('registerResult', '❌ 请填写所有必填字段', null, 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            // 不再添加owner字段，后端从token获取
+            formData.append('title', title);
+            formData.append('author', author);
+            if (description) {
+                formData.append('description', description);
+            }
+
+            try {
+                showResult('registerResult', '<span class="loading"></span>正在注册版权...\n\n1. 上传文件到 IPFS\n2. 注册到区块链\n3. 保存到数据库', null, 'info');
+
+                const response = await fetch(`${API_BASE_URL}/api/copyrights/register-with-file`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: formData
+                });
+
+                // 检查响应状态
+                if (!response.ok) {
+                    let errorMsg = `HTTP ${response.status}: ${response.statusText}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMsg = errorData.message || errorMsg;
+                    } catch (e) {
+                        // 无法解析为JSON，使用状态文本
+                    }
+                    showResult('registerResult', `❌ 请求失败\n\n状态码: ${response.status}\n错误: ${errorMsg}\n\n请检查:\n1. Token是否已设置\n2. 填写的信息是否完整\n3. 文件是否选择`, null, 'error');
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    const result = data.data;
+                    let message = `🎉 版权注册成功！\n\n`;
+                    message += `📋 版权ID: ${result.id}\n`;
+                    message += `📜 合约ID: ${result.contractId}\n`;
+                    message += `👤 所有者地址: ${result.ownerAddress || '从Token获取'}\n`;
+                    message += `📖 作品标题: ${result.title}\n`;
+                    message += `✍️ 作者: ${result.author}\n`;
+                    message += `🔑 文件哈希: ${result.fileHash}\n`;
+                    if (result.description) {
+                        message += `📄 描述: ${result.description}\n`;
+                    }
+                    if (result.transactionHash) {
+                        message += `🔗 区块链交易哈希:\n${result.transactionHash}\n`;
+                    }
+                    message += `\n✨ 您的作品已成功注册到区块链！`;
+
+                    showResult('registerResult', message, result, 'success');
+                } else {
+                    showResult('registerResult', '❌ 注册失败: ' + data.message, data, 'error');
+                }
+            } catch (error) {
+                showResult('registerResult', '❌ 请求失败: ' + error.message + '\n\n可能的原因:\n1. 后端服务未启动\n2. Token未设置或已过期\n3. 网络连接问题', null, 'error');
+            }
+        }
+
+        // 查看版权列表
+        async function listCopyrights() {
+            if (!authToken) {
+                showResult('quickActionResult', '❌ 请先登录', null, 'error');
+                return;
+            }
+
+            try {
+                showResult('quickActionResult', '<span class="loading"></span>正在查询...', null, 'info');
+
+                const response = await fetch(`${API_BASE_URL}/api/copyrights/page?pageNum=1&pageSize=5`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    }
+                });
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    const copyrights = data.data.records;
+                    let message = `✅ 版权列表（共 ${data.data.total} 条）\n\n`;
+
+                    if (copyrights.length === 0) {
+                        message += '暂无版权记录';
+                    } else {
+                        copyrights.forEach((c, index) => {
+                            message += `${index + 1}. ${c.title} - ${c.author}\n`;
+                            message += `   📜 合约ID: ${c.contractId}\n`;
+                            message += `   🔑 文件哈希: ${c.fileHash}\n`;
+                            if (c.description) {
+                                message += `   📄 描述: ${c.description}\n`;
+                            }
+                            message += `\n`;
+                        });
+                    }
+
+                    showResult('quickActionResult', message, data, 'success');
+                } else {
+                    showResult('quickActionResult', '❌ 查询失败: ' + data.message, null, 'error');
+                }
+            } catch (error) {
+                showResult('quickActionResult', '❌ 请求失败: ' + error.message, null, 'error');
+            }
+        }
+
+        // 检查权限状态
+        async function checkPermissions() {
+            if (!authToken) {
+                showResult('quickActionResult', '❌ 请先登录', null, 'error');
+                return;
+            }
+
+            try {
+                showResult('quickActionResult', '<span class="loading"></span>正在检查权限...', null, 'info');
+
+                const response = await fetch(`${API_BASE_URL}/api/admin/check-permissions`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    }
+                });
+                const data = await response.json();
+
+                if (data.code === 0) {
+                    showResult('quickActionResult', '✅ 权限检查完成，请查看应用日志获取详细信息', data, 'success');
+                } else {
+                    showResult('quickActionResult', '❌ 检查失败: ' + data.message, null, 'error');
+                }
+            } catch (error) {
+                showResult('quickActionResult', '❌ 请求失败: ' + error.message, null, 'error');
+            }
+        }
+
+        // 测试文件下载（仅用于本地存储的文件）
+        async function testDownload() {
+            if (!uploadedFileHash) {
+                showResult('quickActionResult', '❌ 请先上传文件', null, 'error');
+                return;
+            }
+
+            // 如果是IPFS hash，提示使用网关
+            if (uploadedFileHash.startsWith('Qm') || uploadedFileHash.startsWith('b')) {
+                showResult('quickActionResult',
+                    `ℹ️ IPFS 文件访问\n\n文件已上传到 IPFS\nHash: ${uploadedFileHash}\n\n请通过 IPFS 网关访问:\nhttps://ipfs.io/ipfs/${uploadedFileHash}`,
+                    null,
+                    'info'
+                );
+            } else if (uploadedFileHash.startsWith('local://')) {
+                // 本地文件，提取文件名
+                const fileName = uploadedFileHash.replace('local://', '').split('?')[0];
+                const downloadUrl = `${API_BASE_URL}/api/files/download/${fileName}`;
+                showResult('quickActionResult',
+                    `ℹ️ 本地文件下载\n\n文件 Hash: ${uploadedFileHash}\n\n下载链接:\n${downloadUrl}\n\n点击下方按钮下载:`,
+                    null,
+                    'info'
+                );
+
+                // 添加下载按钮
+                const resultDiv = document.getElementById('quickActionResult');
+                const downloadBtn = document.createElement('a');
+                downloadBtn.href = downloadUrl;
+                downloadBtn.className = 'link-button';
+                downloadBtn.textContent = '📥 下载文件';
+                downloadBtn.style.display = 'block';
+                downloadBtn.style.textAlign = 'center';
+                downloadBtn.style.marginTop = '15px';
+                resultDiv.appendChild(downloadBtn);
+            }
+        }
+
+        // 清除所有结果
+        function clearResults() {
+            const results = document.querySelectorAll('.result');
+            results.forEach(r => r.style.display = 'none');
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('copyrightFileName').textContent = '';
+        }
+
+        // 显示结果
+        function showResult(elementId, message, data, type) {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result ' + type;
+
+            let html = `<pre>${message}</pre>`;
+            if (data && typeof data === 'object') {
+                html += `<pre style="margin-top: 10px; font-size: 11px;">📋 完整响应:\n${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            resultDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
